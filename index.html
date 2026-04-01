@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Qalab AI — Intelligent Systems Consultancy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a08;
+      --off-white: #f5f0e8;
+      --sand: #d4c9b0;
+      --gold: #c9a84c;
+      --gold-dim: #8a6d2f;
+      --red: #b83232;
+      --mid: #2a2a26;
+      --text-muted: #7a7a6e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--off-white);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* GRAIN OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 48px;
+      border-bottom: 1px solid rgba(201,168,76,0.12);
+      background: rgba(10,10,8,0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .nav-logo span {
+      color: var(--off-white);
+      font-weight: 300;
+      font-style: italic;
+    }
+
+    .nav-tag {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 140px 48px 80px 48px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      margin-right: 12px;
+      vertical-align: middle;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--off-white);
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--sand);
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .hero-desc {
+      font-size: 0.78rem;
+      line-height: 1.9;
+      color: var(--text-muted);
+      max-width: 400px;
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    /* WAITLIST FORM */
+    .waitlist-wrap {
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .waitlist-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 12px;
+    }
+
+    .waitlist-form {
+      display: flex;
+      gap: 0;
+      max-width: 420px;
+    }
+
+    .waitlist-form input {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-right: none;
+      color: var(--off-white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      padding: 14px 18px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .waitlist-form input::placeholder { color: var(--text-muted); }
+    .waitlist-form input:focus { border-color: var(--gold); }
+
+    .waitlist-form button {
+      background: var(--gold);
+      border: 1px solid var(--gold);
+      color: var(--black);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 22px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      white-space: nowrap;
+    }
+
+    .waitlist-form button:hover {
+      background: var(--off-white);
+      border-color: var(--off-white);
+    }
+
+    .waitlist-count {
+      margin-top: 12px;
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .waitlist-count span { color: var(--gold); }
+
+    .success-msg {
+      display: none;
+      margin-top: 16px;
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+
+    /* HERO RIGHT */
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, transparent 50%, rgba(184,50,50,0.04) 100%);
+      z-index: 1;
+    }
+
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.12;
+      background-image:
+        linear-gradient(var(--gold) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gold) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridShift 20s linear infinite;
+    }
+
+    @keyframes gridShift {
+      0% { transform: translate(0,0); }
+      100% { transform: translate(60px, 60px); }
+    }
+
+    .hero-diagram {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 380px;
+      height: 380px;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeIn 1.2s ease 1s forwards;
+    }
+
+    .diagram-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+
+    .ring-1 { inset: 0; animation: rotateSlow 30s linear infinite; }
+    .ring-2 { inset: 40px; animation: rotateSlow 20s linear infinite reverse; border-color: rgba(201,168,76,0.15); }
+    .ring-3 { inset: 80px; animation: rotateSlow 40s linear infinite; border-color: rgba(201,168,76,0.1); }
+
+    @keyframes rotateSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .diagram-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .diagram-center .ar {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      color: var(--gold);
+      opacity: 0.6;
+      line-height: 1;
+      display: block;
+    }
+
+    .diagram-node {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 12px var(--gold);
+    }
+
+    .node-1 { top: -4px; left: 50%; transform: translateX(-50%); }
+    .node-2 { bottom: -4px; left: 50%; transform: translateX(-50%); }
+    .node-3 { left: -4px; top: 50%; transform: translateY(-50%); }
+    .node-4 { right: -4px; top: 50%; transform: translateY(-50%); }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+      margin: 0 48px;
+    }
+
+    /* SERVICES */
+    .services {
+      padding: 100px 48px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      margin-bottom: 64px;
+    }
+
+    .section-num {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--off-white);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(201,168,76,0.1);
+    }
+
+    .service-card {
+      background: var(--black);
+      padding: 40px 36px;
+      transition: background 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .service-card:hover { background: var(--mid); }
+    .service-card:hover::after { transform: scaleX(1); }
+
+    .service-num {
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      margin-bottom: 20px;
+    }
+
+    .service-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--off-white);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .service-desc {
+      font-size: 0.7rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    /* WHY */
+    .why {
+      padding: 100px 48px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .why-left .section-title { font-size: 2.8rem; line-height: 1.1; }
+    .why-left .section-title em { font-style: italic; color: var(--gold); display: block; }
+
+    .why-points {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      padding-top: 8px;
+    }
+
+    .why-point {
+      border-left: 1px solid rgba(201,168,76,0.2);
+      padding-left: 24px;
+      transition: border-color 0.3s;
+    }
+
+    .why-point:hover { border-color: var(--gold); }
+
+    .why-point-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--off-white);
+      margin-bottom: 8px;
+    }
+
+    .why-point-desc {
+      font-size: 0.7rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    /* FINAL CTA */
+    .cta-section {
+      padding: 120px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: 'QALAB';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20vw;
+      font-weight: 600;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.05);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .cta-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .cta-title em { font-style: italic; color: var(--gold); }
+
+    .cta-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 48px;
+      letter-spacing: 0.05em;
+      position: relative;
+    }
+
+    .cta-form {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      position: relative;
+    }
+
+    .cta-form input {
+      width: 280px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-right: none;
+      color: var(--off-white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      padding: 16px 20px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .cta-form input:focus { border-color: var(--gold); }
+    .cta-form input::placeholder { color: var(--text-muted); }
+
+    .cta-form button {
+      background: var(--gold);
+      border: 1px solid var(--gold);
+      color: var(--black);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 16px 28px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .cta-form button:hover { background: var(--off-white); border-color: var(--off-white); }
+
+    .cta-success {
+      display: none;
+      margin-top: 20px;
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      position: relative;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(201,168,76,0.1);
+      padding: 32px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+    }
+
+    .footer-copy {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 120px 24px 80px; }
+      .services { padding: 60px 24px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .why { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
+      .cta-section { padding: 80px 24px; }
+      .cta-form { flex-direction: column; align-items: center; }
+      .cta-form input { border-right: 1px solid rgba(201,168,76,0.25); border-bottom: none; width: 280px; }
+      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+      .divider { margin: 0 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Qalab <span>AI</span></div>
+    <div class="nav-tag">Intelligent Systems Consultancy</div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Now Accepting Waitlist Applications</p>
+      <h1>Where <em>Intelligence</em><br>Meets Strategy</h1>
+      <p class="hero-subtitle">AI Consultancy for the Modern Enterprise</p>
+      <p class="hero-desc">
+        Qalab AI helps businesses integrate artificial intelligence into their operations — from workflow automation to decision intelligence. We translate complex AI capabilities into clear, measurable business outcomes.
+      </p>
+
+      <div class="waitlist-wrap">
+        <p class="waitlist-label">Join the Waitlist</p>
+        <div class="waitlist-form">
+          <input type="email" id="hero-email" placeholder="your@email.com" autocomplete="off" />
+          <button onclick="joinWaitlist('hero')">Reserve Spot</button>
+        </div>
+        <p class="waitlist-count">Already <span id="hero-count">47</span> professionals on the list</p>
+        <p class="success-msg" id="hero-success">✦ You're on the list. We'll be in touch.</p>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="grid-lines"></div>
+      <div class="hero-diagram">
+        <div class="diagram-ring ring-1">
+          <div class="diagram-node node-1"></div>
+          <div class="diagram-node node-2"></div>
+          <div class="diagram-node node-3"></div>
+          <div class="diagram-node node-4"></div>
+        </div>
+        <div class="diagram-ring ring-2"></div>
+        <div class="diagram-ring ring-3"></div>
+        <div class="diagram-center">
+          <span class="ar">ق</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SERVICES -->
+  <section class="services">
+    <div class="section-header">
+      <span class="section-num">01 —</span>
+      <h2 class="section-title">What We Do</h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <p class="service-num">001</p>
+        <h3 class="service-name">AI Strategy & Roadmapping</h3>
+        <p class="service-desc">We assess your current operations and identify where AI delivers the highest ROI. You get a clear, prioritised implementation roadmap — not a generic report.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">002</p>
+        <h3 class="service-name">Process Automation</h3>
+        <p class="service-desc">From document processing to financial reporting, we automate the repetitive work that drains your team — using purpose-built AI tools, not off-the-shelf software.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">003</p>
+        <h3 class="service-name">Financial Intelligence</h3>
+        <p class="service-desc">Specialising in AI applications for financial services — fund accounting, reconciliation, compliance monitoring, and data-driven decision support.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">004</p>
+        <h3 class="service-name">Custom AI Implementation</h3>
+        <p class="service-desc">We build and deploy tailored AI solutions — from internal knowledge assistants to client-facing tools — integrated directly into your existing workflows.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">005</p>
+        <h3 class="service-name">Team Enablement</h3>
+        <p class="service-desc">Your team learns to work alongside AI effectively. Practical training, not theory — focused on the tools and prompting techniques that actually move the needle.</p>
+      </div>
+      <div class="service-card">
+        <p class="service-num">006</p>
+        <h3 class="service-name">Ongoing Advisory</h3>
+        <p class="service-desc">AI moves fast. A retained advisory relationship keeps your business ahead — monthly strategy sessions, tool evaluations, and proactive recommendations.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHY -->
+  <section class="why">
+    <div class="why-left">
+      <span class="section-num">02 —</span>
+      <h2 class="section-title">Why<br><em>Qalab</em></h2>
+    </div>
+    <div class="why-points">
+      <div class="why-point">
+        <h4 class="why-point-title">Finance-Native Expertise</h4>
+        <p class="why-point-desc">Our founder's background in fund accounting means we understand the precision, compliance demands, and data complexity of financial operations — not just AI theory.</p>
+      </div>
+      <div class="why-point">
+        <h4 class="why-point-title">Implementation, Not Just Advice</h4>
+        <p class="why-point-desc">We don't hand you a slide deck and leave. We stay involved through deployment, iteration, and adoption — until the solution is actually working.</p>
+      </div>
+      <div class="why-point">
+        <h4 class="why-point-title">Boutique Attention</h4>
+        <p class="why-point-desc">We work with a small number of clients at a time. Your project gets senior attention — not a junior team running a templated playbook.</p>
+      </div>
+      <div class="why-point">
+        <h4 class="why-point-title">Qalab — Arabic for "Core"</h4>
+        <p class="why-point-desc">The name reflects our philosophy: AI should be at the core of your business, not bolted on. We build from the inside out.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2 class="cta-title">Ready to <em>Transform</em><br>Your Operations?</h2>
+    <p class="cta-sub">Join the waitlist. We open to new clients in Q1 2027.</p>
+    <div class="cta-form">
+      <input type="email" id="cta-email" placeholder="your@email.com" autocomplete="off" />
+      <button onclick="joinWaitlist('cta')">Join Waitlist</button>
+    </div>
+    <p class="cta-success" id="cta-success">✦ You're on the list. We'll be in touch soon.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">QALAB AI</div>
+    <div class="footer-copy">© 2026 Qalab AI Consultancy — All rights reserved</div>
+  </footer>
+
+  <script>
+    // Waitlist logic — stores entries in localStorage
+    const storageKey = 'qalab_waitlist';
+
+    function getWaitlist() {
+      try { return JSON.parse(localStorage.getItem(storageKey)) || []; }
+      catch { return []; }
+    }
+
+    function saveWaitlist(list) {
+      localStorage.setItem(storageKey, JSON.stringify(list));
+    }
+
+    function updateCount() {
+      const list = getWaitlist();
+      const base = 47;
+      const total = base + list.length;
+      document.querySelectorAll('[id$="-count"]').forEach(el => el.textContent = total);
+    }
+
+    function joinWaitlist(source) {
+      const input = document.getElementById(source + '-email');
+      const email = input.value.trim();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        input.style.borderColor = '#b83232';
+        setTimeout(() => input.style.borderColor = '', 1000);
+        return;
+      }
+
+      const list = getWaitlist();
+      if (!list.includes(email)) {
+        list.push(email);
+        saveWaitlist(list);
+      }
+
+      input.value = '';
+      input.style.borderColor = 'rgba(201,168,76,0.25)';
+
+      const successEl = document.getElementById(source + '-success');
+      successEl.style.display = 'block';
+      setTimeout(() => successEl.style.display = 'none', 4000);
+
+      updateCount();
+    }
+
+    // Allow Enter key
+    document.querySelectorAll('input[type="email"]').forEach(input => {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          const source = input.id.replace('-email', '');
+          joinWaitlist(source);
+        }
+      });
+    });
+
+    updateCount();
+  </script>
+
+</body>
+</html>
